@@ -56,6 +56,7 @@ class _AggregateReportDoc(Document):
     org_extra_contact_info = Text()
     report_id = Text()
     date_range = Date()
+    index_date = Date()
     errors = Text()
     published_policy = Object(_PublishedPolicy)
     source_ip_address = Ip()
@@ -346,6 +347,7 @@ def save_aggregate_report_to_elasticsearch(aggregate_report,
             org_extra_contact_info=metadata["org_extra_contact_info"],
             report_id=metadata["report_id"],
             date_range=date_range,
+            index_date=index_date,
             errors=metadata["errors"],
             published_policy=published_policy,
             source_ip_address=record["source"]["ip_address"],
