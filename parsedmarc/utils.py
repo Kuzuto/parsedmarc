@@ -26,10 +26,8 @@ import geoip2.errors
 import requests
 import publicsuffix2
 
-USER_AGENT = "Mozilla/5.0 ((0 {1})) parsedmarc".format(
-            platform.system(),
-            platform.release(),
-        )
+USER_AGENT = "Mozilla/5.0 (({} {})) parsedmarc".format(platform.system(),
+                                                       platform.release())
 
 parenthesis_regex = re.compile(r'\s*\(.*\)\s*')
 
