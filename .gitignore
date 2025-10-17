@@ -106,7 +106,7 @@ ENV/
 .idea/
 
 # VS Code launch config
-.vscode/launch.json
+#.vscode/launch.json
 
 # Visual Studio Code settings
 #.vscode/
@@ -136,3 +136,10 @@ samples/private
 
 *.html
 *.sqlite-journal
+
+parsedmarc.ini
+scratch.py
+
+parsedmarc/resources/maps/base_reverse_dns.csv
+parsedmarc/resources/maps/unknown_base_reverse_dns.csv
+*.bak

@@ -1,6 +1,152 @@
 Changelog
 =========
 
+8.18.7
+------
+
+Removed improper spaces from  `base_reverse_dns_map.csv` (Closes #612)
+
+8.18.6
+------
+
+- Fix since option to correctly work with weeks (PR #604)
+- Add 183 entries to `base_reverse_dns_map.csv`
+- Add 57 entries to `known_unknown_base_reverse_dns.txt`
+- Check for invalid UTF-8 bytes in `base_reverse_dns_map.csv` at build
+- Exclude unneeded items from the `parsedmarc.resources` module at build
+
+8.18.5
+------
+
+- Fix CSV download
+
+8.18.4
+------
+
+- Fix webhooks
+
+8.18.3
+------
+
+- Move `__version__` to `parsedmarc.constants`
+- Create a constant `USER_AGENT`
+- Use the HTTP `User-Agent` header value `parsedmarc/version` for all HTTP requests
+
+8.18.2
+------
+
+- Merged PR #603
+  - Fixes issue #595 - CI test fails for Elasticsearch
+    - Moved Elasticsearch to a separate Docker service container for CI testing
+    - Dropped Python 3.8 from CI testing
+  - Fixes lookup and saving of DMARC forensic reports in Elasticsearch and OpenSearch
+- Updated fallback `base_reverse_dns_map.csv`, which now includes over 1,400 lines
+- Updated included `dbip-country-lite.mmdb` to the June 2025 release
+- Automatically fall back to the internal `base_reverse_dns_map.csv` if the received file is not valid (Fixes #602)
+  - Print the received data to the debug log
+
+8.18.1
+------
+
+- Add missing `https://` to the default Microsoft Graph URL
+
+8.18.0
+------
+
+- Add support for Microsoft national clouds via Graph API base URL (PR #590)
+- Avoid stopping processing when an invalid DMARC report is encountered (PR #587)
+- Increase `http.client._MAXHEADERS` from `100` to `200` to avoid errors connecting to Elasticsearch/OpenSearch (PR #589)
+
+8.17.0
+------
+
+- Ignore duplicate aggregate DMARC reports with the same `org_name` and `report_id` seen within the same hour (Fixes #535)
+- Fix saving SMTP TLS reports to OpenSearch (PR #585 closed issue #576)
+- Add 303 entries to `base_reverse_dns_map.csv`
+
+8.16.1
+------
+
+- Failed attempt to ignore aggregate DMARC reports seen within a period of one hour (#535)
+
+8.16.0
+------
+
+- Add a `since` option to only search for emails since a certain time (PR #527)
+
+8.15.4
+------
+
+- Fix crash if aggregate report timespan is > 24 hours
+
+8.15.3
+------
+
+- Ignore aggregate reports with a timespan of > 24 hours (Fixes #282)
+
+8.15.2
+------
+
+- Require `mailsuite>=1.9.18`
+  - Pins `mail-parser` version at `3.15.0` due to a parsing regression in mail-parser `4.0.0`
+  - Parse aggregate reports with empty `<auth_results>`
+  - Do not overwrite the log on each run (PR #569 fixes issue #565)
+
+8.15.1
+------
+
+- Proper IMAP namespace fix (Closes issue #557 and issue #563)
+  - Require `mailsuite>=1.9.17`
+  - Revert PR #552
+- Add pre-flight check for nameservers (PR #562 closes issue #543)
+- Reformat code with `ruff`
+
+8.15.0
+------
+
+- Fix processing of SMTP-TLS reports ([#549](https://github.com/domainaware/parsedmarc/issues/549)), which broke in commit [410663d ](https://github.com/domainaware/parsedmarc/commit/410663dbcaba019ca3d3744946348b56a635480b)(PR [#530](https://github.com/domainaware/parsedmarc/pull/530))
+  - This PR enforced a stricter check for base64-encoded strings, which SMTP TLS reports from Google did not pass
+  - Removing the check introduced its own issue, because some file paths were treated as base64-encoded strings
+- Create a separate `extract_report_from_file_path()` function for processioning reports based on a file path
+- Remove report extraction based on a file path from `extract_report()`
+
+8.14.2
+------
+
+- Update `base_reverse_dns_map.csv` to fix over-replacement on [`f3a5f10`](https://github.com/domainaware/parsedmarc/commit/f3a5f10d67b02c5db31ae1f7ced68028f46ca2a3) (PR #553)
+
+8.14.1
+------
+
+- Failed attempt to fix processing of SMTP-TLS reports (#549)
+
+8.14.0
+------
+
+- Skip invalid aggregate report rows without calling the whole report invalid
+  - Some providers such as GoDaddy will send reports with some rows missing a source IP address, while other rows are fine
+- Fix Dovecot support by using the seperator provided by the IPMAP namespace when possible (PR #552 closes #551)
+- Only download `base_reverse_dns_map.csv` once (fixes #542)
+- Update included `base_reverse_dns_map.csv`
+  - Replace University category with Education to be more inclusive
+- Update included `dbip-country-lite.mmdb`
+
+8.13.0
+------
+
+- Add Elastic/OpenSearch index prefix option (PR #531 closes #159)
+- Add GELF output support (PR #532)
+
+8.12.0
+------
+
+- Fix for deadlock with large report (#508)
+- Build: move to kafka-python-ng (#510)
+- Fix new config variables previously not propagated in the code (#524)
+- Fixes for kafka integration (#522)
+- Fix if base_domain is None before get_service_from_reverse_dns_base_domain (#514)
+- Update base_reverse_dns_map.csv
+
 8.11.0
 ------
 
@@ -561,7 +707,7 @@ in the ``elasticsearch`` configuration file section (closes issue #78)
 -----
 
 - Add filename and line number to logging output
-- Improved IMAP error handling  
+- Improved IMAP error handling
 - Add CLI options
 
   ```text

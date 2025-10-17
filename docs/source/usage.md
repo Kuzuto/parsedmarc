@@ -98,6 +98,17 @@ path = parsedmarc
 [syslog]
 server = localhost
 port = 514
+
+[gelf]
+host = logger
+port = 12201
+mode = tcp
+
+[webhook]
+aggregate_url = https://aggregate_url.example.com
+forensic_url = https://forensic_url.example.com
+smtp_tls_url = https://smtp_tls_url.example.com
+timeout = 60
 ```
 
 The full set of configuration options are:
@@ -107,7 +118,7 @@ The full set of configuration options are:
       Elasticsearch, Splunk and/or S3
   - `save_forensic` - bool: Save forensic report data to
       Elasticsearch, Splunk and/or S3
-  - `save_smtp_sts` - bool: Save SMTP-STS report data to
+  - `save_smtp_tls` - bool: Save SMTP-STS report data to
       Elasticsearch, Splunk and/or S3
   - `strip_attachment_payloads` - bool: Remove attachment
       payloads from results
@@ -125,6 +136,8 @@ The full set of configuration options are:
   - `reverse_dns_map_url` - Overrides the default download URL for the reverse DNS map
   - `nameservers` - str: A comma separated list of
       DNS resolvers (Default: `[Cloudflare's public resolvers]`)
+  - `dns_test_address` - str: a dummy address used for DNS pre-flight checks
+      (Default: 1.1.1.1)
   - `dns_timeout` - float: DNS timeout period
   - `debug` - bool: Print debugging messages
   - `silent` - bool: Only print errors (Default: `True`)
@@ -153,6 +166,9 @@ The full set of configuration options are:
   - `check_timeout` - int: Number of seconds to wait for a IMAP
       IDLE response or the number of seconds until the next
       mail check (Default: `30`)
+  - `since` - str: Search for messages since certain time. (Examples: `5m|3h|2d|1w`) 
+      Acceptable units - {"m":"minutes", "h":"hours", "d":"days", "w":"weeks"}). 
+      Defaults to `1d` if incorrect value is provided.
 - `imap`
   - `host` - str: The IMAP server hostname or IP address
   - `port` - int: The IMAP server port (Default: `993`)
@@ -192,6 +208,8 @@ The full set of configuration options are:
   - `mailbox` - str: The mailbox name. This defaults to the
       current user if using the UsernamePassword auth method, but
       could be a shared mailbox if the user has access to the mailbox
+  - `graph_url` - str: Microsoft Graph URL.  Allows for use of National Clouds (ex Azure Gov)
+      (Default: https://graph.microsoft.com)
   - `token_file` - str: Path to save the token file
       (Default: `.token`)
   - `allow_unencrypted_storage` - bool: Allows the Azure Identity
@@ -217,7 +235,7 @@ The full set of configuration options are:
     group and use that as the group id.
 
     ```powershell
-    New-ApplicationAccessPolicy -AccessRight RestrictAccess
+    New-ApplicationAccessPolicy -AccessRight RestrictAccess 
     -AppId "<CLIENT_ID>" -PolicyScopeGroupId "<MAILBOX>"
     -Description "Restrict access to dmarc reports mailbox."
     ```
@@ -240,6 +258,7 @@ The full set of configuration options are:
   - `timeout` - float: Timeout in seconds (Default: 60)
   - `cert_path` - str: Path to a trusted certificates
   - `index_suffix` - str: A suffix to apply to the index names
+  - `index_prefix` - str: A prefix to apply to the index names
   - `monthly_indexes` - bool: Use monthly indexes instead of daily indexes
   - `number_of_shards` - int: The number of shards to use when
     creating the index (Default: `1`)
@@ -262,6 +281,7 @@ The full set of configuration options are:
   - `timeout` - float: Timeout in seconds (Default: 60)
   - `cert_path` - str: Path to a trusted certificates
   - `index_suffix` - str: A suffix to apply to the index names
+  - `index_prefix` - str: A prefix to apply to the index names
   - `monthly_indexes` - bool: Use monthly indexes instead of daily indexes
   - `number_of_shards` - int: The number of shards to use when
     creating the index (Default: `1`)
@@ -317,6 +337,10 @@ The full set of configuration options are:
       credentials, None to disable (Default: `None`)
   - `token_file` - str: Path to save the token file
       (Default: `.token`)
+      
+    :::{note}
+    credentials_file and token_file can be got with [quickstart](https://developers.google.com/gmail/api/quickstart/python).Please change the scope to `https://www.googleapis.com/auth/gmail.modify`.
+    :::
   - `include_spam_trash` - bool: Include messages in Spam and
       Trash when searching reports (Default: `False`)
   - `scopes` - str: Comma separated list of scopes to use when
@@ -339,6 +363,20 @@ The full set of configuration options are:
   :::{note}
     Information regarding the setup of the Data Collection Rule can be found [here](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/tutorial-logs-ingestion-portal).
     :::
+- `gelf`
+  - `host` - str: The GELF server name or IP address
+  - `port` - int: The port to use
+  - `mode` - str: The GELF transport type to use. Valid modes: `tcp`, `udp`, `tls`
+
+- `maildir`
+  - `maildir_path` - str: Full path for mailbox maidir location (Default: `INBOX`)
+  - `maildir_create` - bool: Create maildir if not present (Default: False)
+
+- `webhook` - Post the individual reports to a webhook url with the report as the JSON body
+  - `aggregate_url` - str: URL of the webhook which should receive the aggregate reports
+  - `forensic_url` - str: URL of the webhook which should receive the forensic reports
+  - `smtp_tls_url` - str: URL of the webhook which should receive the smtp_tls reports
+  - `timeout` - int: Interval in which the webhook call should timeout
 
 :::{warning}
 It is **strongly recommended** to **not** use the `nameservers`
